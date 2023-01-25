@@ -9,6 +9,7 @@
           <mat-error *ngIf="productForm?.get(control.key)?.hasError('required')">{{control.key}} is required</mat-error>
           <mat-error *ngIf="productForm?.get(control.key)?.hasError('maxlength')">{{control.key}} must be less than 56 characters</mat-error>
           <mat-error *ngIf="productForm?.get(control.key)?.hasError('min')">{{control.key}} must be greater than 0</mat-error>
+          <mat-error *ngIf="productForm?.get(control.key)?.hasError('isNumber')">{{control.key}} must enter a number</mat-error>
         </mat-form-field>
       </ng-container>
     </mat-card-content>
