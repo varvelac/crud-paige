@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, inject } from '@angular/core';
 import {
   FormBuilder,
   FormControl,
@@ -19,13 +19,18 @@ import { CustomValidators } from 'src/app/validators/customValidators';
 export class ProductDetailsComponent {
   productForm: FormGroup;
   controls: { key: string }[] = [];
-
+  //can externalize this
+  disabledFields: string[] = ['id', 'sku'];
+  data:any
   constructor(
     private _fb: FormBuilder,
-    public _dialogRef: MatDialogRef<ProductDetailsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public _router: Router,
+    public _dataService : DataService,
   ) {
     this.productForm = this._fb.group({}); // to initialize the form
+    //What would be preferred is a service call to get the product by id or sku.  access the sku or id through the route.snapshot.params, and pass through a service call to get the product.  This ensures that the data is fresh.  But for this, I will demonstrate a different way data can be passed
+    this.data = this._router.getCurrentNavigation()?.extras.state
+
   }
 
   ngOnInit() {
@@ -36,6 +41,8 @@ export class ProductDetailsComponent {
     //I'm trying to keep this generic.  I would only need to add a validation object to the config object in the route.
     const group: any = {};
     for (const key in this.data) {
+      if(key === 'id') continue; //I don't want to show the id in the form
+
       group[key] = ['', Validators.required];
       if (key === 'type') {
         group[key] = ['', [Validators.required, Validators.maxLength(56)]];
@@ -56,11 +63,14 @@ export class ProductDetailsComponent {
     if (this.productForm.valid) {
       const product = this.productForm.value;
       //I would add a live service call here to update the product here and on 200, I'd close the dialog or handle the error.
-      this._dialogRef.close(product);
+      
+      this._dataService.setProduct(product);
+
+      this._router.navigate(['/product-list/']);
     }
   }
 
   cancel() {
-    this._dialogRef.close();
+    //this._dialogRef.close();
   }
 }
