@@ -10,7 +10,7 @@ import { Product } from 'src/app/models/product';
 import { DataService } from 'src/app/app.data-service.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MAT_ERROR } from '@angular/material/form-field';
-
+import { CustomValidators } from 'src/app/validators/customValidators';
 @Component({
   selector: 'app-product-details',
   templateUrl: './product-details.component.html',
@@ -21,14 +21,11 @@ export class ProductDetailsComponent {
   controls: { key: string }[] = [];
 
   constructor(
-    private fb: FormBuilder,
-    private _dataService: DataService,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    public dialogRef: MatDialogRef<ProductDetailsComponent>,
+    private _fb: FormBuilder,
+    public _dialogRef: MatDialogRef<ProductDetailsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.productForm = this.fb.group({});
+    this.productForm = this._fb.group({}); // to initialize the form
   }
 
   ngOnInit() {
@@ -44,11 +41,11 @@ export class ProductDetailsComponent {
         group[key] = ['', [Validators.required, Validators.maxLength(56)]];
       }
       if (key === 'price') {
-        group[key] = ['', [Validators.required, Validators.min(1)]];
+        group[key] = ['', [Validators.required, Validators.min(1), CustomValidators.isNumber]];
       }
       this.controls.push({ key: key });
     }
-    this.productForm = this.fb.group(group);
+    this.productForm = this._fb.group(group);
 
     Object.keys(this.data).forEach((key) => { //
       this.productForm.get(key)?.setValue(this.data[key]);
@@ -59,11 +56,11 @@ export class ProductDetailsComponent {
     if (this.productForm.valid) {
       const product = this.productForm.value;
       //I would add a live service call here to update the product here and on 200, I'd close the dialog or handle the error.
-      this.dialogRef.close(product);
+      this._dialogRef.close(product);
     }
   }
 
   cancel() {
-    this.dialogRef.close();
+    this._dialogRef.close();
   }
 }

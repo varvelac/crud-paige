@@ -37,13 +37,14 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.filterOptions = this.config['filterOptions']['options'];
     this.selectedOption = this.config['filterOptions']['selected'];
     this.displayedColumns = this.config['displayedColumns'];
+    
+  }
+
+  ngOnInit() {
     this._dataService.getData(this.config['serviceURL']).subscribe((res) => {
       this.products = res;
       this.dataPreparation();
     });
-  }
-
-  ngOnInit() {
     this.dataSource.filterPredicate = this.filterPredicate;
   }
 
