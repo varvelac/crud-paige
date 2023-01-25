@@ -24,3 +24,7 @@
 mat-form-field{
   width: 23rem;
 }
+.disabled{
+  pointer-events: none;
+  opacity: 0.4;
+}

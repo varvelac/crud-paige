@@ -3,7 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { Product } from '../../models/product';
 import { DataService } from 'src/app/app.data-service.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductDetailsComponent } from '../product-details/product-details.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -31,21 +31,32 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   constructor(
     public _dataService: DataService,
     public _route: ActivatedRoute,
-    public _dialog: MatDialog
+    public _dialog: MatDialog,
+    public _router: Router
   ) {
     this.config = this._route.snapshot.data;
     this.filterOptions = this.config['filterOptions']['options'];
     this.selectedOption = this.config['filterOptions']['selected'];
     this.displayedColumns = this.config['displayedColumns'];
-    
   }
 
   ngOnInit() {
     this._dataService.getData(this.config['serviceURL']).subscribe((res) => {
       this.products = res;
+      //this is one of the many ways to pass data from different components. 
+      const product = this._dataService.getProduct();
+      if (product) {
+        const index = this.products.findIndex(
+          (_product) => _product.sku === product.sku
+        );
+        if (index > -1) {
+          this.products[index] = product;
+        }
+      }
       this.dataPreparation();
     });
     this.dataSource.filterPredicate = this.filterPredicate;
+
   }
 
   dataPreparation() {
@@ -59,23 +70,30 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   }
 
   editProduct(_product: Product): void {
-    const dialogRef = this._dialog.open(ProductDetailsComponent, {
-      data: _product,
-    });
-
-    //Typically, I would make sure that the database remained the authority on data.  I wouldn't want to update the data in the UI until I knew that the database had been updated.  For this assessment, I'm going to update here.
-    dialogRef.afterClosed().subscribe((_result) => {
-      console.log(_result);
-      if (_result) { 
-        const index = this.products.findIndex((product) => {
-          if (product.sku === _result.sku) {
-            return _result;
-          }
-        });
-        this.products[index] = _result;
-        this.applyFilter(); // this approach keeps the user from having to re-select the filter option or hunt down the edit they just made.
-      }
-    });
+    if (this.config.preferDialog) {
+      const dialogRef = this._dialog.open(ProductDetailsComponent, {
+        data: _product,
+      });
+      //This would instatiate a dialog/modal with the product details component and pass the product as data.  I'm soft disabling this through a config setting. more might need to be done to have both options work.
+      dialogRef.afterClosed().subscribe((_result) => {
+        console.log(_result);
+        if (_result) {
+          const index = this.products.findIndex((product) => {
+            if (product.sku === _result.sku) {
+              return _result;
+            }
+          });
+          this.products[index] = _result;
+          // this approach keeps the user from having to re-select the filter option or hunt down the edit they just made.
+          this.applyFilter(); 
+        }
+      });
+    } else {
+      //we are able to navigate from our logic and even pass data to the next component. There are a lot of ways to navigate and pass data.  This is one of them.
+      this._router.navigate(['/product-detail/', _product.sku], {
+        state: _product,
+      });
+    }
   }
 
   applyFilter() {
