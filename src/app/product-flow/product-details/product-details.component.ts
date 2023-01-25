@@ -28,6 +28,7 @@ export class ProductDetailsComponent {
     public _dataService : DataService,
   ) {
     this.productForm = this._fb.group({}); // to initialize the form
+    //What would be preferred is a service call to get the product by id or sku.  access the sku or id through the route.snapshot.params, and pass through a service call to get the product.  This ensures that the data is fresh.  But for this, I will demonstrate a different way data can be passed
     this.data = this._router.getCurrentNavigation()?.extras.state
 
   }
