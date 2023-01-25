@@ -1,0 +1,26 @@
+
+#dialog{
+  position:relative;
+  width:25rem;
+  height:auto;
+ 
+}
+#form{
+  min-width: 23rem;
+
+}
+#submit{
+  position:absolute;
+  margin:1rem;
+  left:0;
+  bottom:.5rem;
+}
+#cancel{
+  position:absolute;
+  margin:1rem;
+  right:0;
+  bottom:.5rem;
+}
+mat-form-field{
+  width: 23rem;
+}

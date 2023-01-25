@@ -1,0 +1,21 @@
+<div id="dialog">
+<form id="form" [formGroup]="productForm" (ngSubmit)="saveProduct()">
+  <mat-card class="product-form">
+    <mat-card-content>
+      <ng-container *ngFor="let control of controls; index as i;">
+        <mat-form-field>
+          <mat-label>{{control.key | titlecase}}</mat-label>
+          <input matInput [formControlName]="control.key" value="data[i]">
+          <mat-error *ngIf="productForm?.get(control.key)?.hasError('required')">{{control.key}} is required</mat-error>
+          <mat-error *ngIf="productForm?.get(control.key)?.hasError('maxlength')">{{control.key}} must be less than 56 characters</mat-error>
+          <mat-error *ngIf="productForm?.get(control.key)?.hasError('min')">{{control.key}} must be greater than 0</mat-error>
+        </mat-form-field>
+      </ng-container>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button id="submit" color="primary" type="submit" [disabled]="productForm.invalid">Save</button>
+      <button mat-raised-button id="cancel" color="warn" (click)="cancel()">Cancel</button>
+    </mat-card-actions>
+  </mat-card>
+</form>
+</div>

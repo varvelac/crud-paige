@@ -1,0 +1,13 @@
+table{
+  width: 80%;
+}
+#tableContainer{
+  width: 100%;
+  overflow: auto;
+  position:relative;
+}
+.filterInput{
+  position:absolute;
+  top:0;
+
+}
