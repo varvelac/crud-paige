@@ -4,20 +4,32 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ProductListComponent } from './product-list.component';
 import { Product } from '../../models/product';
-import { DataService } from 'src/app/app.data-service.service';
+import { DataService } from 'src/app/product-flow/product.service';
 import { of } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProductModule } from '../product.module';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ProductDetailsComponent } from '../product-details/product-details.component';
+import {RouterTestingModule} from '@angular/router/testing';
+
 
 describe('ProductListComponent', () => {
   let component: ProductListComponent;
   let fixture: ComponentFixture<ProductListComponent>;
   let dataService: DataService;
   let route: ActivatedRoute;
+  let router: Router;
+  let products: Product[];
+
+
+  const dataServiceMock = {
+    getData: () => of([]),
+    setProductListState: jasmine.createSpy(),
+    getProducts: jasmine.createSpy()
+};
+
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -28,10 +40,17 @@ describe('ProductListComponent', () => {
         ProductModule,
         MatSelectModule,
         NoopAnimationsModule,
+        RouterTestingModule
       ],
       declarations: [ProductListComponent],
       providers: [
-        { provide: DataService, useValue: { getData: () => of([]) } },
+        DataService,
+        { 
+          provide: DataService, 
+          useValue: {getProductListState : () => {}, getProducts: () => {}, getData: () => {}, setProductListState : () => {}, deleteProduct : () => {},
+          setProducts : () => {},
+          },
+        },
         //This was a pain to figure out.  I had to mock the ActivatedRoute and provide the data I needed.
         {
           provide: ActivatedRoute,
@@ -71,17 +90,19 @@ describe('ProductListComponent', () => {
     component = fixture.componentInstance;
     dataService = TestBed.get(DataService);
     route = TestBed.get(ActivatedRoute);
+    router = TestBed.get(Router);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+
+    it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should call data service to get products', () => {
-    spyOn(dataService, 'getData').and.callThrough();
+    spyOn(dataService, 'getProducts').and.callThrough();
     component.ngOnInit();
-    expect(dataService.getData).toHaveBeenCalled();
+    expect(dataService.getProducts).toHaveBeenCalled();
   });
 
   it('should set filter options and display columns from route data', () => {
@@ -108,23 +129,23 @@ describe('ProductListComponent', () => {
   });
 
   it('should create a dialog when editProduct is called', () => {
-    component.products = [
-      new Product(1, 'sku1', 'name1', 'type1', 'description1', 'color1', 50),
-    ];
-    spyOn(component._dialog, 'open').and.callThrough();
+    component.products = [new Product(1, 'sku1', 'name1', 'type1', 'description1', 'color1', 50)];
+    component.selectedOption = 'blue';
+    component.config.preferDialog = false;
+    spyOn(router, 'navigate');
     component.editProduct(component.products[0]);
-    expect(component._dialog.open).toHaveBeenCalled();
-    expect(component._dialog.open).toHaveBeenCalledWith(ProductDetailsComponent, {data:component.products[0]}); //specifically asking it to open the product details component with the data of the product we passed in.
-  });
+    dataService.setProductListState('blue');
+    expect(router.navigate).toHaveBeenCalledWith(['/product-detail/', component.products[0].sku], {
+      state: component.products[0],
+    });
+});
 
-  it('should delete a product when deleteProduct is called', () => {
-    component.products = [
-      new Product(1, 'sku1', 'name1', 'type1', 'description1', 'color1', 50),
-      new Product(2, 'sku2', 'name2', 'type2', 'description2', 'color2', 50),
-    ];
-    component.deleteProduct('sku1');
-    console.log(component.products);
-    expect(component.products.length).toEqual(1);
-    expect(component.products[0].sku).toEqual('sku2'); //This is just showing that the pevious product was deleted.
-  });
+it('should delete a product when deleteProduct is called', () => {
+  component.products = [ 
+  new Product(1, 'sku1', 'name1', 'type1', 'description1', 'color1', 50),
+  new Product(2, 'sku2', 'name2', 'type2', 'description2', 'color2', 50)];
+  spyOn(dataService, 'deleteProduct').and.callThrough();
+  component.deleteProduct('sku1');
+  expect(dataService.deleteProduct).toHaveBeenCalledWith('sku1');
+});
 });
