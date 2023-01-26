@@ -23,7 +23,9 @@ const routes: Routes = [
     preferDialog:false
   } 
 },
-  { path: 'product-detail/:sku', component: ProductDetailsComponent, data:{ ignoreList : ['id', 'sku']}} //I would easily be able to route to this new page and pass the sku as a parameter, but I thought the user would not want to lose their place on the table, so I decided to use a dialog instead.
+  { path: 'product-detail/:sku', component: ProductDetailsComponent, 
+  data:{ disabledFields : ['id', 'sku']}} 
+  
 ];
 
 @NgModule({

@@ -27,7 +27,7 @@ import {MatIconModule} from '@angular/material/icon';
     MatDialogModule,
     MatCardModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
 
   ],
   declarations: [ProductListComponent, ProductDetailsComponent],
