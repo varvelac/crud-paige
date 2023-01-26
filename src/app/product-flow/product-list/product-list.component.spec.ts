@@ -3,7 +3,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatDialogModule } from '@angular/material/dialog';
 import { ProductListComponent } from './product-list.component';
-import { Product } from '../../models/product';
+import { Product } from '../models/product';
 import { DataService } from 'src/app/product-flow/product.service';
 import { of } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
