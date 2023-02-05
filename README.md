@@ -1,5 +1,9 @@
 # CrudPaige
 
+This is a part of a code assessment for a company hiring an angular developer.  fingers crossed they select me
+
+
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.1.2.
 
 ## Development server
